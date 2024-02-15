@@ -9,16 +9,14 @@ import pandas as pd
 users_csv_path = os.path.join('data', 'users.csv')
 
 def hash_password(password):
-    # This is a simple hashing function.
-    # For real-world applications, you should use a salt and consider using bcrypt.
     return hashlib.sha256(password.encode('utf-8')).hexdigest()
 
-def register_user(username, password, role):
+def register_user(username, password, role, IdMenago, IdDyr):
     user_id = generate_new_user_id()  # You need to implement this function
     password_hash = hash_password(password)
     with open(users_csv_path, 'a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([user_id, username, password_hash, role])
+        writer.writerow([user_id, username, password_hash, role, IdMenago, IdDyr])
     print(f"User {username} registered successfully.")
 
 def check_login(username, password):
