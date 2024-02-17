@@ -13,7 +13,6 @@ class AddTaskWindow(QDialog):
         self.setWindowTitle("Dodaj nowe zadanie")
         layout = QVBoxLayout(self)
         self.user_info =user_info
-        print(user_info)
         self.employee_combo_box = QComboBox()
         layout.addWidget(QLabel("Wybierz pracownika:"))
         layout.addWidget(self.employee_combo_box)

@@ -49,8 +49,6 @@ class LoginWindow(QWidget):
 
 
 if __name__ == "__main__":
-    dataBaseHandler = DataBaseHandler()
-
     app = QApplication(sys.argv)
     login_window = LoginWindow()
     login_window.show()
