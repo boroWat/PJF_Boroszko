@@ -17,7 +17,11 @@ class AddTaskWindow(QDialog):
         layout.addWidget(QLabel("Wybierz pracownika:"))
         layout.addWidget(self.employee_combo_box)
         self.dataBaseHandler = DataBaseHandler()
-        employees = self.dataBaseHandler.get_employees()
+        if user_info['stanowisko'] == 'Manager':
+            employees = self.dataBaseHandler.get_employees(user_info['stanowisko'],user_info['zespol'])
+        else:
+            employees = self.dataBaseHandler.get_employees(user_info['stanowisko'],user_info['jednostka'])
+
         for emp in employees:
             self.employee_combo_box.addItem(f"{emp['imie']} {emp['nazwisko']}", emp['id'])
 

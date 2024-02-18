@@ -7,9 +7,9 @@ from DataBaseHandler import DataBaseHandler
 
 class TaskButton(QWidget):
     status_changed = Signal(str)
-    def __init__(self,task_id, title, duration,status,workday, parent=None):
+    def __init__(self,task_id, title, duration,status,workday,empID, parent=None):
         super().__init__(parent)
-
+        self.empID = empID
         self.db_handler = DataBaseHandler()
         self.task_id = task_id
         self.work_day = workday
@@ -70,14 +70,16 @@ class TaskButton(QWidget):
 
         task_data = self.db_handler.get_task_by_id(self.task_id)
 
-        print(task_data)
-
         # Ustawianie etykiet z danymi zadania
         title_label = QLabel(f"<b>Tytuł: </b>{task_data['tytul']}")
         title_label.setStyleSheet("font-size: 15px;")
 
         description_label = QLabel(f"<b>Opis: </b> {task_data['opis']}")
         description_label.setStyleSheet("font-size: 14px;")
+
+        piorytet_label = QLabel(f"<b>Piorytet: </b> {task_data['piorytet']}")
+        piorytet_label.setStyleSheet("font-size: 14px;")
+
         comments_label = QLabel("<b>Uwagi:</b>")
         comments_edit = QTextEdit(dialog)
         comments_edit.setPlainText(task_data['uwagi'])
@@ -85,6 +87,7 @@ class TaskButton(QWidget):
         # Dodawanie etykiet i pola uwag do layoutu
         form_layout.addRow(title_label)
         form_layout.addRow(description_label)
+        form_layout.addRow(piorytet_label)
         form_layout.addRow(comments_label, comments_edit)
 
         # Dodanie pól wyboru czasu i statusu do layoutu
@@ -115,16 +118,16 @@ class TaskButton(QWidget):
 
         # Łączenie przycisków z funkcjami
         save_button.clicked.connect(lambda: self.save_task_changes(
-            start_time_edit.time(), end_time_edit.time(), status_combo.currentText(), comments_edit.toPlainText(),self.work_day))
+            start_time_edit.time(), end_time_edit.time(), status_combo.currentText(), comments_edit.toPlainText(),self.work_day,self.empID))
         cancel_button.clicked.connect(dialog.reject)
 
         dialog.setLayout(form_layout)
         dialog.setFixedSize(400, 300)
         dialog.exec()
 
-    def save_task_changes(self, start_time, end_time, status,comments,work_day):
+    def save_task_changes(self, start_time, end_time, status,comments,work_day,empID):
         print(f"Czas rozpoczęcia: {start_time.toString()}, Czas zakończenia: {end_time.toString()}, Status: {status}")
-        self.db_handler.update_task(self.task_id, start_time, end_time, status, comments,work_day)
+        self.db_handler.update_task(self.task_id, start_time, end_time, status, comments,work_day,empID)
         self.status_changed.emit(status)
         dialog = self.findChild(QDialog)  # Znajdź okno dialogowe, którego dotyczy przycisk "Zapisz"
         if dialog:
