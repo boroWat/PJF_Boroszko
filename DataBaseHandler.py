@@ -12,6 +12,7 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         if not self.is_default_accounts_added():
             self.add_default_accounts()
             self.mark_default_accounts_added()
+
     def createTables(self):
         self.createTableAccounts()
         self.createTableTask()
@@ -80,6 +81,7 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
             )
         ''')
         self.connection.commit()  # Zatwierdza wprowadzone zmiany do bazy danych
+
     def createTableChangeStatus(self):
         cursor = self.connection.cursor()
         cursor.execute('''
@@ -92,6 +94,7 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
                    )
                ''')
         self.connection.commit()
+
     def createTableAccounts(self):  # Tworzy tabelę "transactions" w bazie danych, jeżeli nie istnieje.
         cursor = self.connection.cursor()  # Tworzy obiekt kursora, który jest używany do wykonania operacji na bazie danych
         cursor.execute('''
@@ -108,13 +111,12 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         ''')
         self.connection.commit()  # Zatwierdza wprowadzone zmiany do bazy danych
 
-
     def add_default_accounts(self):
         default_accounts = [
-            ("Jan", "Kowalski","jan","abc", "Pracownik", "Główny", "Zespół A"),
-            ("Jakub", "Boroszko","jakub","abc", "Pracownik", "Główny", "Zespół A"),
-            ("Anna", "Nowak","anna","bc", "Manager", "Główna", "Zespół A"),
-            ("Piotr", "Wiśniewski","piotr","Abc", "Dyrektor", "Główna", None)
+            ("Jan", "Kowalski", "jan", "abc", "Pracownik", "Główny", "Zespół A"),
+            ("Jakub", "Boroszko", "jakub", "abc", "Pracownik", "Główny", "Zespół A"),
+            ("Anna", "Nowak", "anna", "bc", "Manager", "Główna", "Zespół A"),
+            ("Piotr", "Wiśniewski", "piotr", "Abc", "Dyrektor", "Główna", None)
         ]
 
         cursor = self.connection.cursor()
@@ -124,13 +126,12 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         ''', default_accounts)
         self.connection.commit()
 
-
-    def add_account(self, imie, nazwisko,login,haslo, stanowisko, jednostka, zespol):
+    def add_account(self, imie, nazwisko, login, haslo, stanowisko, jednostka, zespol):
         cursor = self.connection.cursor()
         cursor.execute('''
             INSERT INTO accounts (imie, nazwisko,login,haslo, stanowisko, jednostka, zespol)
             VALUES (?, ?, ?,?,?, ?, ?)
-        ''', (imie, nazwisko,login,haslo, stanowisko, jednostka, zespol))
+        ''', (imie, nazwisko, login, haslo, stanowisko, jednostka, zespol))
         self.connection.commit()
 
     def authenticate_user(self, username, password):
@@ -161,12 +162,12 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         tasks = cursor.fetchall()
         return [{'tytul': task[0]} for task in tasks]
 
-    def add_task(self, osobaID,przelozonyID, status, piorytet, tytul, opis, uwagi, startTime, endTime):
+    def add_task(self, osobaID, przelozonyID, status, piorytet, tytul, opis, uwagi, startTime, endTime):
         cursor = self.connection.cursor()
         cursor.execute('''
             INSERT INTO task (osobaID,przelozonyID, status, piorytet, tytul, opis, uwagi, dataDodania, deadLine)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (osobaID,przelozonyID, status, piorytet, tytul, opis, uwagi, startTime, endTime))
+        ''', (osobaID, przelozonyID, status, piorytet, tytul, opis, uwagi, startTime, endTime))
         self.connection.commit()
 
     def get_employees(self, stanowiskoDodajacej, zespolLubJednostka):
@@ -197,7 +198,7 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         for task in tasks:
             startDateTime = datetime.strptime(task[8], '%Y-%m-%d %H:%M:%S')
             startDate = startDateTime.date()
-            if(startDate<=date):
+            if (startDate <= date):
                 task_list.append({
                     'id': task[0],
                     'osobaID': task[1],
@@ -221,7 +222,6 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         cursor.execute(query, (task_id,))
         task = cursor.fetchone()
         if task:
-
             # Konwersja wyniku zapytania na słownik dla łatwiejszego dostępu
             task_dict = {
                 'id': task[0],
@@ -234,7 +234,7 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
             return task_dict
         return None
 
-    def update_task(self, task_id, start_time, end_time, status, comments, work_day,empID):
+    def update_task(self, task_id, start_time, end_time, status, comments, work_day, empID):
 
         # Sprawdzenie, czy istnieje już wpis dla tego zadania w danym dniu
         query_check_day = "SELECT * FROM day WHERE taskID = ? AND dzien = ?"
@@ -253,7 +253,7 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
             query_insert_day = "INSERT INTO day (dzien, zaczecie, zakonczenie, taskID) VALUES (?, ?, ?, ?)"
             values_insert_day = (work_day, start_time.toString(Qt.ISODate), end_time.toString(Qt.ISODate), task_id)
             cursor.execute(query_insert_day, values_insert_day)
-        pracaCzas = self.calkowityCzasPrzeprowaowanyZadania(task_id,empID)
+        pracaCzas = self.calkowityCzasPrzeprowaowanyZadania(task_id, empID)
         # Aktualizacja statusu i uwag dla zadania
         query_update_task = "UPDATE task SET status = ?, uwagi = ?, przepracowanyCzas = ?  WHERE id = ?"
         values_update_task = (status, comments, pracaCzas, task_id)
@@ -264,7 +264,7 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         cursor.execute(query_update_task1, values_update_task1)
         self.connection.commit()
 
-    def calkowityCzasPrzeprowaowanyZadania(self, task_id,empID):
+    def calkowityCzasPrzeprowaowanyZadania(self, task_id, empID):
         cursor = self.connection.cursor()
         query = "SELECT DISTINCT dzien FROM day WHERE taskID = ?"
         cursor.execute(query, (task_id,))
@@ -273,10 +273,10 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         total_time = 0  # Inicjalizacja łącznego czasu pracy na 0
         for day in days:
             day_date = day[0]
-            total_time += self.czasPracyNaDzien(day_date,empID)
+            total_time += self.czasPracyNaDzien(day_date, empID)
         return total_time
 
-    def czasPracyNaDzien(self, day_date,empID): # wszystkie taski na dzien  --------------- to jest git
+    def czasPracyNaDzien(self, day_date, empID):  # wszystkie taski na dzien  --------------- to jest git
         cursor = self.connection.cursor()
         query = """
                SELECT zaczecie, zakonczenie
@@ -284,7 +284,7 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
                JOIN task ON day.taskID = task.id
                WHERE day.dzien = ? AND task.osobaID = ?
            """
-        cursor.execute(query, (day_date,empID,))
+        cursor.execute(query, (day_date, empID,))
         result = cursor.fetchall()  # Pobieramy wszystkie pasujące wiersze
         if result:
             total_time = 0  # Inicjalizacja łącznego czasu pracy na 0
@@ -299,10 +299,10 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         else:
             return 0
 
-    def dayInfo(self, id,dzien):
+    def dayInfo(self, id, dzien):
         query = "SELECT * FROM day WHERE taskID = ? AND dzien = ?"
         cursor = self.connection.cursor()
-        cursor.execute(query, (id,dzien))
+        cursor.execute(query, (id, dzien))
         day = cursor.fetchone()
         if day:
             # Konwersja wyniku zapytania na słownik dla łatwiejszego dostępu
@@ -314,16 +314,16 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
             return task_dict
 
         return {
-                'id': None,
-                'zaczecie': '00:00:00',
-                'zakonczenie': '00:00:00'
+            'id': None,
+            'zaczecie': '00:00:00',
+            'zakonczenie': '00:00:00'
         }
 
-    def sumaCzasuPracyWTygodniu(self, start_date,empID):
+    def sumaCzasuPracyWTygodniu(self, start_date, empID):
         total_time_week = 0  # Inicjalizacja łącznego czasu pracy w tygodniu na 0
         for i in range(7):  # 7 dni w tygodniu
             day_date = start_date + timedelta(days=i)
-            total_time_week += self.czasPracyNaDzien(day_date,empID)
+            total_time_week += self.czasPracyNaDzien(day_date, empID)
 
         return total_time_week
 
@@ -350,7 +350,7 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         else:
             return 0
 
-    def addEmp(self, name, surname, login, haslo, jednostka, team,stanowisko):
+    def addEmp(self, name, surname, login, haslo, jednostka, team, stanowisko):
         cursor = self.connection.cursor()
         cursor.execute('''
                     INSERT INTO accounts (imie,nazwisko, login, haslo, zespol, jednostka, stanowisko)
@@ -358,16 +358,17 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
                 ''', (name, surname, login, haslo, team, jednostka, stanowisko))
         self.connection.commit()
 
-    def average_daily_work_time(self, emp_id):
+    def average_daily_work_time(self, emp_id, zespol):
         cursor = self.connection.cursor()
         query = """
                SELECT AVG((strftime('%s', zakonczenie) - strftime('%s', zaczecie)) / 60) AS avg_time
                FROM day
                JOIN task ON day.taskID = task.id
-               WHERE task.osobaID = ?
+               JOIN accounts ON task.osobaID = accounts.id
+               WHERE task.osobaID = ? AND zespol = ?
                GROUP BY dzien
            """
-        cursor.execute(query, (emp_id,))
+        cursor.execute(query, (emp_id, zespol))
         results = cursor.fetchall()
         total_minutes = 0
         for result in results:
@@ -382,7 +383,7 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         query = """
                SELECT id FROM accounts WHERE zespol = ? AND stanowisko = ?
            """
-        cursor.execute(query, (team_name,"Pracownik",))
+        cursor.execute(query, (team_name, "Pracownik",))
         results = cursor.fetchall()
         total_average_minutes = 0
         num_employees = len(results)  # Liczba pracowników w zespole
@@ -390,51 +391,26 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
         for result in results:
             emp_id = result[0]
             total_average_minutes += self.average_daily_work_time(
-                emp_id)  # Dodajemy średni czas pracy dla danego pracownika
+                emp_id, team_name)  # Dodajemy średni czas pracy dla danego pracownika
 
         if num_employees > 0:
-            average_team_work_minutes  = total_average_minutes / num_employees  # Średni czas pracy dla zespołu
+            average_team_work_minutes = total_average_minutes / num_employees  # Średni czas pracy dla zespołu
 
             return average_team_work_minutes
         else:
             return 0
 
-    def calculate_percentage_done_before_deadline(self):
-        cursor = self.connection.cursor()
-
-        # Znajdź wszystkie wpisy w tabeli `change`, gdzie data zmiany jest wcześniejsza niż deadline
-        query = """
-            SELECT COUNT(*) 
-            FROM change 
-            JOIN task ON change.taskID = task.id 
-            WHERE strftime('%Y-%m-%d', change.dzien) < strftime('%Y-%m-%d', task.deadline) AND 
-             change.opis LIKE 'Zmieniono status na Zakonczone%')
-        """
-        cursor.execute(query)
-        done_before_deadline_count = cursor.fetchone()[0]  # Liczba zadań zmienionych przed deadlinem
-
-        # Oblicz liczbę wszystkich wpisów w tabeli `change`
-        query_total = "SELECT COUNT(*) FROM task"
-        cursor.execute(query_total)
-        total_task_count = cursor.fetchone()[0]  # Całkowita liczba zadan
-
-        # Oblicz procent zadań zmienionych przed deadlinem
-        if total_task_count > 0:
-            percentage_changed_before_deadline = (done_before_deadline_count / total_task_count) * 100
-        else:
-            percentage_changed_before_deadline = 0
-
-        return percentage_changed_before_deadline
-
-    def tasks_by_status(self):
+    def tasks_by_status(self, zespol):
         cursor = self.connection.cursor()
 
         query = """
             SELECT status, COUNT(*) AS count
             FROM task
+            JOIN accounts ON task.osobaID = accounts.ID
+            WHERE accounts.zespol = ?
             GROUP BY status
         """
-        cursor.execute(query)
+        cursor.execute(query, (zespol,))
         results = cursor.fetchall()
 
         # Utwórz słownik status: liczba_zadań
@@ -442,10 +418,51 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
 
         return tasks_status_dict
 
-    def allTask(self):
+    def allTask(self, zespol):
         cursor = self.connection.cursor()
         cursor.execute('''
-                    SELECT * FROM task
+            SELECT task.*
+            FROM task 
+            JOIN accounts ON task.osobaID = accounts.ID
+            WHERE accounts.zespol = ?
+        ''', (zespol,))
+        tasks = cursor.fetchall()
+        tasks_dict = {}
+        for task in tasks:
+            task_id = task[0]
+            task_details = {
+                'osobaID': task[1],
+                'przelozonyID': task[2],
+                'status': task[3],
+                'piorytet': task[4],
+                'tytul': task[5],
+                'opis': task[6],
+                'uwagi': task[7],
+                'dataDodania': task[8],
+                'deadLine': task[9],
+                'przepracowanyCzas': task[10]
+            }
+            tasks_dict[task_id] = task_details
+        print(tasks_dict)
+        return tasks_dict
+
+    def get_employee_details(self, employee_id):
+        cursor = self.connection.cursor()
+        query = "SELECT imie, nazwisko,zespol,stanowisko FROM accounts WHERE id = ?"
+        cursor.execute(query, (employee_id,))
+        employee_details = cursor.fetchone()
+
+        if employee_details:
+            return {'imie': employee_details[0], 'nazwisko': employee_details[1],'zespol': employee_details[2],'stanowisko': employee_details[3]}
+        else:
+            return None
+
+    def allTaskDyr(self):
+        cursor = self.connection.cursor()
+        cursor.execute('''
+                    SELECT task.*
+                    FROM task 
+                    
                 ''')
         tasks = cursor.fetchall()
         tasks_dict = {}
@@ -464,16 +481,31 @@ class DataBaseHandler:  # odpowiada za obsługę bazy danych SQLite w kontekści
                 'przepracowanyCzas': task[10]
             }
             tasks_dict[task_id] = task_details
-
+        print(tasks_dict)
         return tasks_dict
 
-    def get_employee_details(self, employee_id):
+    def tasks_by_statusDyr(self):
         cursor = self.connection.cursor()
-        query = "SELECT imie, nazwisko FROM accounts WHERE id = ?"
-        cursor.execute(query, (employee_id,))
-        employee_details = cursor.fetchone()
 
-        if employee_details:
-            return {'imie': employee_details[0], 'nazwisko': employee_details[1]}
-        else:
-            return None
+        query = """
+                    SELECT status, COUNT(*) AS count
+                    FROM task
+                    GROUP BY status
+                """
+        cursor.execute(query, )
+        results = cursor.fetchall()
+
+        # Utwórz słownik status: liczba_zadań
+        tasks_status_dict = {result[0]: result[1] for result in results}
+
+        return tasks_status_dict
+
+    def get_teams(self, jednostka):
+        cursor = self.connection.cursor()
+        cursor.execute('''
+                SELECT DISTINCT zespol 
+                FROM accounts 
+                WHERE jednostka = ? AND zespol IS NOT NULL
+            ''', (jednostka,))
+        teams = cursor.fetchall()
+        return [team[0] for team in teams]

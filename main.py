@@ -39,23 +39,14 @@ class LoginWindow(QWidget):
             self.close()
             if authenticated['stanowisko'] == 'Pracownik':
                 self.main_window = EmployeeWindow(authenticated)
-                self.main_window.logout_signal.connect(self.show_login_window)
             elif authenticated['stanowisko'] == 'Manager':
                 self.main_window = ManagerWindow(authenticated)
-                self.main_window.logout_signal.connect(self.show_login_window)
             elif authenticated['stanowisko'] == 'Dyrektor':
                 self.main_window = DirectorWindow(authenticated)
-                self.main_window.logout_signal.connect(self.show_login_window)
             self.main_window.show()
         else:
             QMessageBox.warning(self, "Błąd logowania", "Nieprawidłowa nazwa użytkownika lub hasło")
 
-    def show_login_window(self):
-        # Wyświetlenie okna logowania po wylogowaniu
-        self.main_window.close()
-        self.username_input.clear()
-        self.password_input.clear()
-        self.show()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

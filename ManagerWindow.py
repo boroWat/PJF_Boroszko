@@ -16,6 +16,7 @@ from DataBaseHandler import DataBaseHandler
 
 class ManagerWindow(QMainWindow):
     logout_signal = Signal()
+
     def __init__(self, user_info):
         super().__init__()
         self.setWindowTitle("Panel managera")
@@ -67,7 +68,7 @@ class ManagerWindow(QMainWindow):
 
     def add_buttons(self):
         # Dodanie przycisków do layoutu
-        button_texts = ["Statystyka 1", "Statystyka 2", "Statystyka 3"]
+        button_texts = ["Czas pracy", "Statusy", "Tabela"]
         for text in button_texts:
             button = QPushButton(text)
             button.clicked.connect(self.show_stats)
@@ -77,13 +78,13 @@ class ManagerWindow(QMainWindow):
         button = self.sender()
         stats_text = ""
         self.clear_stats_widget()
-        if button.text() == "Statystyka 1" or button.text() == "Statystyka 2":
+        if button.text() == "Czas pracy" or button.text() == "Statusy":
             # Ukryj tabelę jeśli istnieje i pokaż wykres
             if self.table is not None:
                 self.table.hide()
                 self.chart_canvas.show()
 
-        if button.text() == "Statystyka 1":
+        if button.text() == "Czas pracy":
             # Pobranie pracowników z zespołu
             employees = self.db_handler.get_employees(self.user_info['stanowisko'], self.user_info['zespol'])
             if employees:
@@ -91,7 +92,7 @@ class ManagerWindow(QMainWindow):
                 average_daily_work_time_per_employee = []
                 for employee in employees:
                     emp_id = employee['id']
-                    avg_daily_work_time = self.db_handler.average_daily_work_time(emp_id)
+                    avg_daily_work_time = self.db_handler.average_daily_work_time(emp_id,self.user_info['zespol'])
 
                     #print(avg_daily_work_time)
 
@@ -124,12 +125,12 @@ class ManagerWindow(QMainWindow):
             else:
                 stats_text = "Brak pracowników w zespole."
 
-        elif button.text() == "Statystyka 2":
+        elif button.text() == "Statusy":
             # Pobierz dane do wykresu
             self.chart_figure.clear()
 
-            tasks_status_dict = self.db_handler.tasks_by_status()
-            allTask = self.db_handler.allTask()
+            tasks_status_dict = self.db_handler.tasks_by_status(self.user_info['zespol'])
+            allTask = self.db_handler.allTask(self.user_info['zespol'])
             labels = list(tasks_status_dict.keys())
             counts = list(tasks_status_dict.values())
 
@@ -146,7 +147,7 @@ class ManagerWindow(QMainWindow):
                 status = task_details['status']
                 stats_text += f"Tytuł: {title}, Status: {status}\n"
 
-        elif button.text() == "Statystyka 3":
+        elif button.text() == "Tabela":
             self.tabela()
 
         # Wyświetlenie statystyk
@@ -163,7 +164,7 @@ class ManagerWindow(QMainWindow):
         self.table.show()
         self.clear_stats_widget()
 
-        all_tasks = self.db_handler.allTask()
+        all_tasks = self.db_handler.allTask(self.user_info['zespol'])
         num_rows = len(all_tasks)
         self.table.setRowCount(num_rows)  # Ustaw liczbę wierszy
 
