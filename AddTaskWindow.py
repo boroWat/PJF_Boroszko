@@ -12,9 +12,31 @@ class AddTaskWindow(QDialog):
         super().__init__()
         self.setWindowTitle("Dodaj nowe zadanie")
         layout = QVBoxLayout(self)
+        self.setStyleSheet("""
+                                   QPushButton {
+                                       background-color: #4CAF50;
+                                       border: none;
+                                       color: white;
+                                       padding: 3px 10px;
+                                       text-align: center;
+                                       text-decoration: none;
+                                       font-size: 14px;
+                                       margin: 4px 2px;
+                                       cursor: pointer;
+                                       border-radius: 8px;
+                                   }
+
+                                   QPushButton:hover {
+                                       background-color: #45a049;
+                                   }
+
+                                   QPushButton:pressed {
+                                       background-color: #3e8e41;
+                                   }
+                               """)
         self.user_info =user_info
         self.employee_combo_box = QComboBox()
-        layout.addWidget(QLabel("Wybierz pracownika:"))
+        layout.addWidget(QLabel("<b>Wybierz pracownika:</b>"))
         layout.addWidget(self.employee_combo_box)
         self.dataBaseHandler = DataBaseHandler()
         if user_info['stanowisko'] == 'Manager':
@@ -25,28 +47,28 @@ class AddTaskWindow(QDialog):
         for emp in employees:
             self.employee_combo_box.addItem(f"{emp['imie']} {emp['nazwisko']}", emp['id'])
 
-        self.title_label = QLabel("Tytuł:")
+        self.title_label = QLabel("<b>Tytuł:</b>")
         self.title_input = QLineEdit()
 
-        self.description_label = QLabel("Opis:")
+        self.description_label = QLabel("<b>Opis:</b>")
         self.description_input = QLineEdit()
 
-        self.comments_label = QLabel("Uwagi:")
+        self.comments_label = QLabel("<b>Uwagi:</b>")
         self.comments_input = QLineEdit()
 
-        self.deadline_label = QLabel("Termin wykonania:")
+        self.deadline_label = QLabel("<b>Termin wykonania:</b>")
         self.deadline_input = QCalendarWidget()
         self.deadline_input.setSelectedDate(QDate.currentDate())
 
-        self.deadlinetime_label = QLabel("Godzina wykonania:")
+        self.deadlinetime_label = QLabel("<b>Godzina wykonania:</b>")
         self.deadlinetime_input = QTimeEdit()
         self.deadlinetime_input.setTime(QTime.currentTime())
 
-        self.priority_label = QLabel("Priorytet:")
+        self.priority_label = QLabel("<b>Priorytet:</b>")
         self.priority_input = QComboBox()
         self.priority_input.addItems(["Niski", "Średni", "Wysoki"])
 
-        self.status_label = QLabel("Status:")
+        self.status_label = QLabel("<b>Status:</b>")
         self.status_input = QComboBox()
         self.status_input.addItems(["Nowe", "W trakcie", "Zakończone"])
 

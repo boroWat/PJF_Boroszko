@@ -10,14 +10,35 @@ class AddEmpWindow(QDialog):
         layout = QVBoxLayout(self)
         self.user_info = user_info
         self.db_handler = DataBaseHandler()
+        self.setStyleSheet("""
+                                   QPushButton {
+                                       background-color: #4CAF50;
+                                       border: none;
+                                       color: white;
+                                       padding: 3px 10px;
+                                       text-align: center;
+                                       text-decoration: none;
+                                       font-size: 14px;
+                                       margin: 4px 2px;
+                                       cursor: pointer;
+                                       border-radius: 8px;
+                                   }
 
-        self.name_label = QLabel("Imie:")
+                                   QPushButton:hover {
+                                       background-color: #45a049;
+                                   }
+
+                                   QPushButton:pressed {
+                                       background-color: #3e8e41;
+                                   }
+                               """)
+        self.name_label = QLabel("<b>Imie:</b>")
         self.name_input = QLineEdit()
-        self.surname_label = QLabel("Nazwisko:")
+        self.surname_label = QLabel("<b>Nazwisko:</b>")
         self.surname_input = QLineEdit()
-        self.login_label = QLabel("Login:")
+        self.login_label = QLabel("<b>Login:</b>")
         self.login_input = QLineEdit()
-        self.haslo_label = QLabel("Hasło:")
+        self.haslo_label = QLabel("<b>Hasło:</b>")
         self.haslo_input = QLineEdit()
 
         self.add_button = QPushButton("Dodaj pracownika")

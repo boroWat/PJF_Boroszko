@@ -1,13 +1,12 @@
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QInputDialog, QPushButton, QHBoxLayout, \
     QTableWidgetItem, QTableWidget, QTextEdit
-from matplotlib import pyplot as plt
+
 from matplotlib.backends.backend_template import FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from PySide6.QtWidgets import QWidget, QVBoxLayout
-import matplotlib.pyplot as plt
 from AddEmpWindow import AddEmpWindow
 from AddTaskWindow import AddTaskWindow
 from DataBaseHandler import DataBaseHandler
@@ -27,10 +26,21 @@ class ManagerWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.layout = QVBoxLayout(self.central_widget)
-        self.buttons_layout = QHBoxLayout()
-        self.layout.addLayout(self.buttons_layout)
 
-        self.add_buttons()
+        self.upperButtons_layout = QHBoxLayout()
+        self.add_task_button = QPushButton("Dodaj nowe zadanie")
+        self.add_task_button.clicked.connect(self.open_add_task_window)
+        self.upperButtons_layout.addWidget(self.add_task_button)
+
+        self.add_emp_button = QPushButton("Dodaj nowego pracownika")
+        self.add_emp_button.clicked.connect(self.open_add_empl_window)
+        self.upperButtons_layout.addWidget(self.add_emp_button)
+
+        self.logout_button = QPushButton("Wyloguj")
+        self.logout_button.clicked.connect(self.logout)
+        self.upperButtons_layout.addWidget(self.logout_button)
+
+        self.layout.addLayout(self.upperButtons_layout)
 
         self.table = QTableWidget()
         self.table.setColumnCount(9)
@@ -48,22 +58,35 @@ class ManagerWindow(QMainWindow):
         self.chart_figure = Figure()
         self.chart_canvas = FigureCanvas(self.chart_figure)
         self.layout.addWidget(self.chart_canvas)
-        self.add_task_button = QPushButton("Dodaj nowe zadanie")
-        self.add_task_button.clicked.connect(self.open_add_task_window)
 
-        self.add_emp_button = QPushButton("Dodaj nowego pracownika")
-        self.add_emp_button.clicked.connect(self.open_add_empl_window)
-
-        self.logout_button = QPushButton("Wyloguj")
-        self.logout_button.clicked.connect(self.logout)
-
-        self.layout.addWidget(self.add_task_button)
-        self.layout.addWidget(self.add_emp_button)
-        self.layout.addWidget(self.logout_button)
+        self.buttons_layout = QHBoxLayout()
+        self.layout.addLayout(self.buttons_layout)
+        self.add_buttons()
 
         # Inicjalizacja bazy danych
         self.db_handler = DataBaseHandler()
+        self.setStyleSheet("""
+                    QPushButton {
+                        background-color: #4CAF50;
+                        border: none;
+                        color: white;
+                        padding: 3px 18px;
+                        text-align: center;
+                        text-decoration: none;
+                        font-size: 14px;
+                        margin: 4px 2px;
+                        cursor: pointer;
+                        border-radius: 8px;
+                    }
 
+                    QPushButton:hover {
+                        background-color: #45a049;
+                    }
+
+                    QPushButton:pressed {
+                        background-color: #3e8e41;
+                    }
+                """)
         self.tabela()
 
     def add_buttons(self):
@@ -116,11 +139,11 @@ class ManagerWindow(QMainWindow):
                 # Wyświetl wykres w oknie podręcznym
                 self.chart_canvas.draw()
 
-                stats_text += f"Średni czas pracy dzienny pracowników w zespole '{self.user_info['zespol']}':\n"
+                stats_text += f"<b><big>Średni czas pracy dzienny pracowników w zespole '{self.user_info['zespol']}':</big><b/> "
                 for emp, avg_time in average_daily_work_time_per_employee:
                     hours = int(avg_time // 60)
                     minutes = int(avg_time % 60)
-                    stats_text += f"{emp}: {hours} h {minutes} min\n"
+                    stats_text += f"<br>{emp}: {hours} h {minutes} min"
 
             else:
                 stats_text = "Brak pracowników w zespole."
@@ -141,11 +164,13 @@ class ManagerWindow(QMainWindow):
             ax.set_title('Procentowy udział zadań w poszczególnych statusach')
 
             self.chart_canvas.draw()
-            stats_text += f"Zadania:\n"
+
+            stats_text += "<b><big>Zadania:</big></b>"
+            stats_text+= "\n"
             for task_id, task_details in allTask.items():
                 title = task_details['tytul']
                 status = task_details['status']
-                stats_text += f"Tytuł: {title}, Status: {status}\n"
+                stats_text += f"<br><b>Tytuł: {title}, Status: {status}</b>"  # Dodanie pogrubienia
 
         elif button.text() == "Tabela":
             self.tabela()

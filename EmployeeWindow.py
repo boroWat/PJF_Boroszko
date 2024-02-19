@@ -31,7 +31,28 @@ class EmployeeWindow(QMainWindow):
         self.prev_week_button.clicked.connect(self.prev_week)
         self.next_week_button = QPushButton('->', self)
         self.next_week_button.clicked.connect(self.next_week)
+        self.setStyleSheet("""
+                            QPushButton {
+                                background-color: #4CAF50;
+                                border: none;
+                                color: white;
+                                padding: 3px 10px;
+                                text-align: center;
+                                text-decoration: none;
+                                font-size: 14px;
+                                margin: 4px 2px;
+                                cursor: pointer;
+                                border-radius: 8px;
+                            }
 
+                            QPushButton:hover {
+                                background-color: #45a049;
+                            }
+
+                            QPushButton:pressed {
+                                background-color: #3e8e41;
+                            }
+                        """)
         today = datetime.date.today()
         monday = today - datetime.timedelta(days=today.weekday())
         sunday = monday + datetime.timedelta(days=6)
